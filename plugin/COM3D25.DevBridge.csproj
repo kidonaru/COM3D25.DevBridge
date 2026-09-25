@@ -1,0 +1,102 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    COM3D25.DevBridge — カスタムオーダーメイド 3D2.5 dev 専用 live introspection bridge。
+    稼働中ゲームに localhost C# REPL を公開する。dev 専用＝いかなるリリースにも含めない。
+    前提: BepInEx 5 (Unity Mono) 既定（-p:BepInExVersion=6 で BepInEx 6.0.0-be も可）。
+    ゲーム本体 DLL は $(GameDir) のインストール先から直接参照する。
+    Mono.CSharp.dll は Unity 2022.3.62f2 editor の MonoBleedingEdge/lib/mono/unityjit-win32 から vendor。
+    このプロファイルはゲームの COM3D2x64_Data/Managed/mscorlib.dll とバイト単位で一致する＝実機 ABI と同一。
+  -->
+  <!--
+    BepInExVersion: BepInEx メジャーバージョン。省略時は 5。CLI: dotnet build -p:BepInExVersion=6
+  -->
+  <PropertyGroup>
+    <BepInExVersion Condition="'$(BepInExVersion)' == ''">5</BepInExVersion>
+    <!--
+      COM3D2.5 のインストール先。開発者ごとに異なるため既定値は持たない。
+      npm run plugin:build 経由ならリポジトリ直下の .env から渡される。
+      csproj を直接叩く場合は GAME_DIR 環境変数か -p:GameDir=D:\COM3D2_5 で指定する。
+    -->
+    <GameDir Condition="'$(GameDir)' == ''">$(GAME_DIR)</GameDir>
+  </PropertyGroup>
+
+  <Target Name="ValidateGameDir" BeforeTargets="BeforeBuild">
+    <Error Condition="'$(GameDir)' == ''"
+           Text="GameDir が未設定です。リポジトリ直下の .env に GAME_DIR を設定して npm run plugin:build を使うか、dotnet build -p:GameDir=&lt;インストール先&gt; を指定してください。" />
+    <Error Condition="!Exists('$(GameDir)\COM3D2x64_Data\Managed\Assembly-CSharp.dll')"
+           Text="GameDir が COM3D2.5 のインストール先ではありません: $(GameDir)" />
+  </Target>
+  <PropertyGroup Condition="'$(BepInExVersion)' == '5'">
+    <DefineConstants>$(DefineConstants);BIE5</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(BepInExVersion)' == '6'">
+    <DefineConstants>$(DefineConstants);BIE6</DefineConstants>
+    <NoWarn>$(NoWarn);BepInEx002</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- mcs(net_4_x) 参照で型解決が崩れる場合は net472 へ切替（make-or-break・Task 4/8 参照） -->
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>COM3D25.DevBridge</AssemblyName>
+    <Product>COM3D25.DevBridge</Product>
+    <Version>0.6.1</Version>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>COM3D25.DevBridge</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <!-- net_4_x の mcs / game dll を参照する際の mscorlib バージョン警告を抑制（Mono 実機では同一） -->
+    <NoWarn>$(NoWarn);CS1701;CS1702;BepInEx002</NoWarn>
+    <RestoreAdditionalProjectSources>
+      https://api.nuget.org/v3/index.json;
+      https://nuget.bepinex.dev/v3/index.json
+    </RestoreAdditionalProjectSources>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="src/**/*.cs" />
+  </ItemGroup>
+
+  <!-- BepInEx 5 用パッケージ -->
+  <ItemGroup Condition="'$(BepInExVersion)' == '5'">
+    <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
+    <PackageReference Include="BepInEx.Core" Version="5.*" />
+    <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
+    <PackageReference Include="UnityEngine.Modules" Version="2022.3.62" IncludeAssets="compile" />
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.*" PrivateAssets="all" />
+  </ItemGroup>
+  <!-- BepInEx 6 用パッケージ（bepinex dev feed） -->
+  <ItemGroup Condition="'$(BepInExVersion)' == '6'">
+    <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
+    <PackageReference Include="BepInEx.Unity.Mono" Version="6.0.0-*" />
+    <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
+    <PackageReference Include="UnityEngine.Modules" Version="2022.3.62" IncludeAssets="compile" />
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.*" PrivateAssets="all" />
+  </ItemGroup>
+
+  <!-- vendored mcs。Private=true で plugin フォルダへ配置（実機ロードに必須）。 -->
+  <ItemGroup>
+    <Reference Include="Mono.CSharp">
+      <HintPath>lib\Mono.CSharp.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- ゲーム本体 DLL（再配布不可なので Private=false） -->
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp" Publicize="true">
+      <HintPath>$(GameDir)\COM3D2x64_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- BepInEx 5 同梱の Harmony（実機ランタイムと同一バイナリを参照。再配布しないので Private=false）。
+       BepInEx 6 は BepInEx.Unity.Mono が HarmonyX を推移的に提供するため追加参照不要。 -->
+  <ItemGroup Condition="'$(BepInExVersion)' == '5'">
+    <Reference Include="0Harmony">
+      <HintPath>$(GameDir)\BepInEx\core\0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>

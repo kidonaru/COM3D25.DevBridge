@@ -1,0 +1,14 @@
+{
+  "name": "com3d25-devbridge",
+  "version": "0.6.1",
+  "description": "稼働中の COM3D2.5 へ C# REPL を通す dev 専用 MCP サーバーと、実機検証・MOD 反映のスキル",
+  "author": { "name": "kidonaru" },
+  "repository": "https://github.com/kidonaru/COM3D25.DevBridge",
+  "mcpServers": {
+    "com3d25-devbridge": {
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/dist/server.mjs"],
+      "env": { "COM3D25_DEVBRIDGE_DATA_DIR": "${CLAUDE_PLUGIN_DATA}" }
+    }
+  }
+}

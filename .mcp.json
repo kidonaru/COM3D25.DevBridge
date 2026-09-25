@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "com3d25-devbridge": {
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": {
+        "BRIDGE_URL": "http://127.0.0.1:18650"
+      }
+    }
+  }
+}

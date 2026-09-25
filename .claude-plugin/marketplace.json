@@ -1,0 +1,12 @@
+{
+  "name": "com3d25-devbridge",
+  "description": "COM3D2.5 のプラグイン開発向けツール",
+  "owner": { "name": "kidonaru" },
+  "plugins": [
+    {
+      "name": "com3d25-devbridge",
+      "source": "./agent-plugin",
+      "description": "稼働中の COM3D2.5 へ C# REPL を通す dev 専用 MCP サーバーと、実機検証・MOD 反映のスキル"
+    }
+  ]
+}

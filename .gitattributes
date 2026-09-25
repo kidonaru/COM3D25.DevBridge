@@ -1,0 +1,2 @@
+# esbuild の生成物。差分は読まず、GitHub の言語統計からも外す
+agent-plugin/dist/server.mjs -diff linguist-generated=true

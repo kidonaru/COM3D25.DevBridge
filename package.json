@@ -1,0 +1,40 @@
+{
+  "name": "com3d25-devbridge-mcp",
+  "version": "0.6.1",
+  "private": true,
+  "description": "COM3D2.5 の loopback ブリッジへ中継する MCP サーバー（stdio）",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kidonaru/COM3D25.DevBridge.git"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "bin": {
+    "com3d25-devbridge-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
+    "test": "vitest run",
+    "start": "node dist/index.js",
+    "bundle": "node scripts/bundle.mjs",
+    "plugin:build": "node scripts/plugin-build.mjs",
+    "plugin:bump": "node scripts/plugin-bump.mjs",
+    "plugin:release": "node scripts/plugin-release.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "esbuild": "^0.28.2",
+    "typescript": "^5.5.0",
+    "vitest": "^4.1.10"
+  }
+}

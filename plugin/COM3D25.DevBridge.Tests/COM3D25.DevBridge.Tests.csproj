@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    COM3D25.DevBridge の純関数（System のみ依存）を xUnit でテストする。
+    本体 dll は参照せず Compile link でソース直リンクする（本体は netstandard2.1 + ゲーム DLL 依存のため）。
+  -->
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="../src/Serialize/JsonGraphWriter.cs" Link="Linked/JsonGraphWriter.cs" />
+    <Compile Include="../src/Http/HttpRequestParser.cs" Link="Linked/HttpRequestParser.cs" />
+    <Compile Include="../src/Eval/ReferencePolicy.cs" Link="Linked/ReferencePolicy.cs" />
+    <Compile Include="../src/Capture/CaptureTargetSpec.cs" Link="Linked/CaptureTargetSpec.cs" />
+    <Compile Include="../src/Eval/DumpValidator.cs" Link="Linked/DumpValidator.cs" />
+    <Compile Include="../src/Eval/AutoWrap.cs" Link="Linked/AutoWrap.cs" />
+    <Compile Include="../src/Watch/WatchRegistry.cs" Link="Linked/WatchRegistry.cs" />
+    <Compile Include="../src/Profile/ProfileTargetSpec.cs" Link="Linked/ProfileTargetSpec.cs" />
+    <Compile Include="../src/Profile/ProfileRegistry.cs" Link="Linked/ProfileRegistry.cs" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,8 @@
+bin/
+obj/
+.claude/
+node_modules/
+/dist/
+screenshots/
+.game-dir
+.env
