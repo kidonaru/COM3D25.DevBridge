@@ -35,7 +35,7 @@ MCP サーバー `com3d25-devbridge` と、次のスキルが入ります。
 
 | スキル | 用途 |
 |---|---|
-| `live-inspect` | 稼働中のゲームを調べる定石（非同期の待ち方、menu のダンプ、性能計測の進め方、Harmony プラグインのホットリロード） |
+| `live-inspect` | 稼働中のゲームを調べる定石（非同期の待ち方、menu のダンプ、性能計測の進め方） |
 | `restart-verify` | ゲームを再起動し、プラグイン DLL の変更を実機で検証する |
 | `model-deploy` | 作った model / mate / menu / tex を Mod フォルダへ導入し、実行中のゲームで再読み込みして確認する（manifest 照合スクリプトに Python 3 を使う） |
 

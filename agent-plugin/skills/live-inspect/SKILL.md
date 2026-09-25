@@ -1,6 +1,6 @@
 ---
 name: live-inspect
-description: Use when a com3d25-devbridge investigation needs more than a single eval — waiting for an asynchronous game change (costume apply, scene load) before reading state, dumping a menu file, narrowing down a slow method with profile_add or a hand-written Harmony patch, or hot-reloading a Harmony plugin build without restarting the game. Also use when asked to "ゲームを再起動せずに反映", "ホットリロード", "重い原因を計測", "menu の中身を見て".
+description: Use when a com3d25-devbridge investigation needs more than a single eval — waiting for an asynchronous game change (costume apply, scene load) before reading state, dumping a menu file, narrowing down a slow method with profile_add or a hand-written Harmony patch. Also use when asked to "重い原因を計測", "menu の中身を見て".
 ---
 
 # 稼働中の COM3D2.5 を調べる
@@ -27,18 +27,7 @@ description: Use when a com3d25-devbridge investigation needs more than a single
 - `profile_add` は描画エントリポイントのような粗い粒度から測り、`profile_read` の結果を見て重い呼び出し先へ 1 段ずつ絞り込む
 - 同名型が複数アセンブリにあると `profile_add` は失敗する。その場合は `eval_csharp` で計測用 static クラスを定義し、`HarmonyLib.Harmony.Patch` で自前の prefix を当てる。計測後は `HarmonyLib.Harmony.UnpatchID(id)` で必ず解除する（`UnpatchAll(string)` は obsolete でコンパイルエラー）
 
-## Harmony プラグインのホットリロード
-
-Harmony パッチで動くプラグインは、ゲームを再起動せずに新ビルドを反映できる。アセンブリはアンロードできないので「旧パッチ解除 → 新版を追加ロード → 再パッチ」で実質リロードにする。
-
-1. `HarmonyLib.Harmony.UnpatchID("<旧パッチ ID>")` で旧パッチを解除する。初回はプラグインのパッチ ID、2 回目以降は前回のリロードで付けた ID
-2. `var asm = System.Reflection.Assembly.Load(System.IO.File.ReadAllBytes(@"<ビルド出力の DLL>"));` で新 DLL を読む。**必ずバイト配列で読む**。`Assembly.LoadFile` はファイルをロックし、ゲーム終了まで DLL を上書きできなくなる
-3. プラグインの static フィールド（Logger 等）は新アセンブリ側では未初期化なので、リフレクションで代入する（例: `BepInEx.Logging.Logger.CreateLogSource("<名前>")`）。`BaseUnityPlugin` の `AddComponent` は Chainloader 外ではできないため、Awake 相当の初期化は手で行う
-4. `HarmonyLib.Harmony.CreateAndPatchAll(asm.GetType("<パッチクラスの完全名>"), "<新パッチ ID>");` で再パッチする。ID をリロードごとに変えると、次に解除する対象を追いやすい
-
-限界: 差し替わるのは Harmony パッチだけ。MonoBehaviour の `Update` / `OnGUI` などは旧アセンブリのまま動き続ける。それらを変えた場合や、初期化が複雑なプラグインは restart-verify スキルで再起動して確かめる。
-
 ## 落とし穴
 
-- 再起動直後や DLL 追加後にプラグインの型が見つからないなら `reset_evaluator`。評価器はプラグインより先に作られる
+- ゲーム起動直後にプラグインの型が見つからないなら `reset_evaluator`。評価器はプラグインより先に作られる
 - 調査で変えた状態は最後に戻す
