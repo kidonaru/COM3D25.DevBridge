@@ -144,7 +144,9 @@ export function registerBasicTools(server: McpServer, bridge: BridgeClient, conf
     {
       description:
         "プロファイルの集計結果を読み出す。指定フレーム数の計測が終わっていればパッチ解除済みで、読み出しと同時に自動解除されるので profile_remove は不要。" +
-        "計測途中でも呼べて、その時点までの集計が返る（この場合パッチは残る）。",
+        "計測途中でも呼べて、その時点までの集計が返る（この場合パッチは残る）。" +
+        "読み方の前提: 再帰メソッドは最外周の呼び出しだけを計測する。極小メソッドはパッチでインライン化が阻害されるため絶対値を信用しない。" +
+        "GC 増分は前後差分で、計測中に GC が走った呼び出しは 0 扱いになる（その呼び出しの割り当ては計上されず少なめに出る）ため傾向を見る用途に限る。メインスレッド以外から呼ばれるメソッドの値は保証しない。",
       inputSchema: { id: z.number().int().describe("profile_add が返した id") },
     },
     wrap(async (args) => bridgeResult(await bridge.profileRead(args.id as number))),

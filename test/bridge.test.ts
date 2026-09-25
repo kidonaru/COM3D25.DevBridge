@@ -25,6 +25,7 @@ describe("BridgeClient", () => {
     const client = new BridgeClient(BASE);
     await expect(client.evalCs("1+1")).rejects.toThrow(BridgeUnreachableError);
     await expect(client.evalCs("1+1")).rejects.toThrow(/ゲーム未起動かプラグイン未ロード/);
+    await expect(client.evalCs("1+1")).rejects.toThrow(/tail_log/);
   });
 
   it("captureRaw は target/downscale を query に載せ PNG バイナリを返す", async () => {
