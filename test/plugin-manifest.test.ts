@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { repoRoot } from "../scripts/plugin-common.mjs";
 import { SERVER_VERSION } from "../src/version.js";
@@ -44,5 +44,15 @@ describe("プラグインマニフェスト", () => {
 
   it("起動対象のバンドルが存在する", () => {
     expect(existsSync(join(repoRoot, "agent-plugin/dist/server.mjs"))).toBe(true);
+  });
+
+  it("同梱スキルの SKILL.md の name はディレクトリ名と一致する（ずれるとスキルとして読まれない）", () => {
+    const skillsDir = join(repoRoot, "agent-plugin/skills");
+    const dirs = readdirSync(skillsDir, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name);
+    expect(dirs).toContain("live-inspect");
+    for (const dir of dirs) {
+      const md = readFileSync(join(skillsDir, dir, "SKILL.md"), "utf8");
+      expect(md.match(/^---\r?\nname: (.+)\r?\n/)?.[1]?.trim()).toBe(dir);
+    }
   });
 });
