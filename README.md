@@ -13,16 +13,16 @@
 ### 1. プラグイン
 
 [Releases](https://github.com/kidonaru/COM3D25.DevBridge/releases) から
-`COM3D25.DevBridge-v<version>.zip` をダウンロードし、`<GameDir>\BepInEx\plugins\` に展開します。
-展開後は次の配置になります:
+`COM3D25.DevBridge-v<version>.zip` をダウンロードし、中の `BepInEx` フォルダを `<GameDir>` 直下にコピーします。
+コピー後は次の配置になります:
 
 ```
 <GameDir>\BepInEx\plugins\COM3D25.DevBridge\
     COM3D25.DevBridge.dll
     Mono.CSharp.dll
-    LICENSE
-    THIRD-PARTY-NOTICES.md
 ```
+
+zip のルートにある `README.md` / `LICENSE` / `THIRD-PARTY-NOTICES.md` は、ゲームフォルダへコピーする必要はありません。
 
 ゲームを起動し、`<GameDir>\BepInEx\LogOutput.log` に次の行が出れば成功です:
 
@@ -126,7 +126,7 @@ Codex ではプラグインのインストール先に保存するため、更�
 | `scene_info` | 現在のシーン名とルート GameObject の要約 |
 | `refresh_mod_files` | 導入済みModのSHA-256照合とゲーム内ファイル検索への登録 |
 | `inspect_clothing` | 衣装のメイドID・menu・Mesh・材質・テクスチャ・装備状態の取得 |
-| `reload_clothing` | 現在有効な衣装menuの再読み込み（SetPropを使わずboDut/boTempDut）と完了待機・前後比較（[手順と制限](docs/clothing-reload.md)） |
+| `reload_clothing` | 現在有効な衣装menuの再読み込み（SetPropを使わずboDut/boTempDut）と完了待機・前後比較（[手順と制限](https://github.com/kidonaru/COM3D25.DevBridge/blob/main/docs/clothing-reload.md)） |
 | `tail_log` | `BepInEx/LogOutput.log` の末尾 N 行（パスは自動解決。**クラッシュ中もキャッシュ済みパスで動く**） |
 
 ## トラブルシュート
@@ -141,7 +141,7 @@ Codex ではプラグインのインストール先に保存するため、更�
 
 ## 開発
 
-ソースからのビルド、テスト、リリース手順は [docs/development.md](docs/development.md) を参照してください。
+ソースからのビルド、テスト、リリース手順は [docs/development.md](https://github.com/kidonaru/COM3D25.DevBridge/blob/main/docs/development.md) を参照してください。
 
 ## ライセンス
 

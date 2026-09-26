@@ -1,7 +1,7 @@
 // plugin を Release ビルドし、zip 化して tag push → GitHub Release まで一括で行う。
 // --dry-run を付けると tag push / release create をスキップし、zip の内容だけを表示する。
 import { mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
-import { basename, join, resolve } from 'node:path';
+import { join, resolve } from 'node:path';
 import {
   artifactDlls,
   buildOutputDir,
@@ -17,8 +17,13 @@ import { bundle, bundleNoticesFile, bundleOutfile } from './bundle.mjs';
 import { createZip } from './zip.mjs';
 
 const configuration = 'Release';
-/** zip に DLL と並べて入れるライセンス文書（リポジトリ直下からの相対パス）。 */
-const releaseNoticeFiles = ['LICENSE', 'THIRD-PARTY-NOTICES.md'];
+/**
+ * zip のルートに置く文書（リポジトリ直下からの相対パス）。README はインストール手順、
+ * LICENSE / THIRD-PARTY-NOTICES.md は Mono.CSharp.dll（MIT）等の再配布に必要なライセンス表示。
+ */
+const releaseRootFiles = ['README.md', 'LICENSE', 'THIRD-PARTY-NOTICES.md'];
+/** DLL を置く zip 内の階層。ゲームフォルダ直下へ展開すると BepInEx のプラグインとして読まれる。 */
+const releasePluginDir = 'BepInEx/plugins/COM3D25.DevBridge';
 const dryRun = process.argv.slice(2).includes('--dry-run');
 
 /** working tree が clean か確認する（未追跡ファイルも対象）。 */
@@ -82,14 +87,13 @@ runMain(async () => {
   buildPlugin(configuration, resolveGameDir());
 
   const outDir = buildOutputDir(configuration);
-  // Mono.CSharp.dll（MIT）の再配布にはライセンス表示の同梱が要るため、DLL と並べて入れる
+  // DLL はゲームフォルダ直下へそのまま展開できる階層に、文書類は zip のルートに置く
   const files = [
-    ...artifactDlls.map((dll) => join(outDir, dll)),
-    ...releaseNoticeFiles.map((f) => resolve(repoRoot, f)),
+    ...releaseRootFiles.map((f) => ({ path: resolve(repoRoot, f), name: f })),
+    ...artifactDlls.map((dll) => ({ path: join(outDir, dll), name: `${releasePluginDir}/${dll}` })),
   ];
-  const entries = files.map((path) => ({
-    // BepInEx/plugins/ 直下に展開できるフォルダ構成にする
-    name: `COM3D25.DevBridge/${basename(path)}`,
+  const entries = files.map(({ path, name }) => ({
+    name,
     data: readFileSync(path),
     mtime: statSync(path).mtime,
   }));
