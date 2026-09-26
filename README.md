@@ -39,9 +39,6 @@ MCP サーバー `com3d25-devbridge` と、次のスキルが入ります。
 | `restart-verify` | ゲームを再起動し、プラグイン DLL の変更を実機で検証する |
 | `model-deploy` | 作った model / mate / menu / tex を Mod フォルダへ導入し、実行中のゲームで再読み込みして確認する（manifest 照合スクリプトに Python 3 を使う） |
 
-> このリポジトリは private です。先に `gh auth login` と `gh auth setup-git` を実行し、
-> git から GitHub に認証できるようにしてください。
-
 Claude Code:
 
 ```bash

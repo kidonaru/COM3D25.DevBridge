@@ -7,7 +7,7 @@ COM3D25.DevBridge をソースから触る人向けの手順。使うだけな�
 | 層 | 実体 | 役割 |
 |---|---|---|
 | BepInEx プラグイン | `plugin/`（C#, netstandard2.1） | ゲーム内に HTTP REPL を公開（`127.0.0.1:18650`） |
-| MCP サーバー | リポジトリ直下（TypeScript, stdio） | Claude Code のツール呼び出しを HTTP ブリッジへ中継 |
+| MCP サーバー | リポジトリ直下（TypeScript, stdio） | Claude Code / Codex のツール呼び出しを HTTP ブリッジへ中継 |
 | 配布用プラグイン | `agent-plugin/` | Claude Code / Codex のプラグイン。MCP サーバーのバンドルと同梱スキル |
 
 リポジトリのルートが npm パッケージ（`com3d25-devbridge-mcp`）で、C# プラグインは `plugin/` 配下にまとまっています。
@@ -60,7 +60,7 @@ dotnet build plugin/COM3D25.DevBridge.csproj -p:BepInExVersion=6 -p:GameDir=W:\C
 ゲームを起動し、`<GameDir>\BepInEx\LogOutput.log` に次の行が出れば成功です:
 
 ```
-COM3D25.DevBridge listening on http://127.0.0.1:18650/ (/ping, /eval, /reset, /capture, /dump, /watch)
+COM3D25.DevBridge listening on http://127.0.0.1:18650/ (/ping, /eval, /reset, /capture, /imgui_windows, /dump, /watch, /profile)
 ```
 
 ## MCP サーバーの開発セットアップ
@@ -72,6 +72,16 @@ npm install && npm run build
 リポジトリ直下の `.mcp.json`（Claude Code）と `.codex/config.toml`（Codex）に
 ローカルビルド（`dist/index.js`）を指す設定があるため、このリポジトリを開けば
 `com3d25-devbridge` サーバーとして読み込まれます。
+
+MCP サーバーは次の環境変数を読みます（いずれも省略可）:
+
+| 変数 | 既定 | 用途 |
+|---|---|---|
+| `BRIDGE_URL` | `http://127.0.0.1:18650` | 接続先のブリッジ |
+| `GAME_DIR` | なし | ゲームのインストール先。通常はブリッジの `/ping` から自動解決するので不要 |
+| `COM3D25_DEVBRIDGE_DATA_DIR` | パッケージのルート | スクリーンショットとゲームパスのキャッシュの保存先（絶対パスのみ有効） |
+
+Claude Code のプラグインは `COM3D25_DEVBRIDGE_DATA_DIR` に `${CLAUDE_PLUGIN_DATA}` を渡します。
 
 プラグイン経由の動作は、このリポジトリのローカルパスをマーケットプレイスとして登録すると push せずに確認できます。
 Claude Code は既存の user スコープ登録を壊さないよう local スコープで入れます。
@@ -136,7 +146,7 @@ CI ではプラグインをビルドしません。csproj がゲーム本体の 
 ## `src/snippets.ts` の運用
 
 高水準ツール（`list_maids` / `scene_info` など）のゲーム側ロジックは
-`src/snippets.ts` の C# テンプレートに置いてあります。
+`src/snippets.ts` の C# テンプレートに置いてあります（衣装系ツールは `src/clothing.ts`）。
 ゲームの更新で API 名がずれた場合の対処:
 
 1. `eval_csharp` で正しいメンバー名を探索する
