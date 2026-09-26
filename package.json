@@ -1,6 +1,6 @@
 {
   "name": "com3d25-devbridge-mcp",
-  "version": "0.6.1",
+  "version": "1.0.0",
   "private": true,
   "description": "COM3D2.5 の loopback ブリッジへ中継する MCP サーバー（stdio）",
   "type": "module",
