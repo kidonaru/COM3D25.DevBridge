@@ -1,7 +1,7 @@
 // plugin を Release ビルドし、zip 化して tag push → GitHub Release まで一括で行う。
 // --dry-run を付けると tag push / release create をスキップし、zip の内容だけを表示する。
 import { mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { basename, join, resolve } from 'node:path';
 import {
   artifactDlls,
   buildOutputDir,
@@ -13,10 +13,12 @@ import {
   run,
   runMain,
 } from './plugin-common.mjs';
-import { bundle, bundleOutfile } from './bundle.mjs';
+import { bundle, bundleNoticesFile, bundleOutfile } from './bundle.mjs';
 import { createZip } from './zip.mjs';
 
 const configuration = 'Release';
+/** zip に DLL と並べて入れるライセンス文書（リポジトリ直下からの相対パス）。 */
+const releaseNoticeFiles = ['LICENSE', 'THIRD-PARTY-NOTICES.md'];
 const dryRun = process.argv.slice(2).includes('--dry-run');
 
 /** working tree が clean か確認する（未追跡ファイルも対象）。 */
@@ -72,23 +74,25 @@ runMain(async () => {
 
   // コードより古いバンドルを tag に載せないため、再生成して差分が出たら止める
   await bundle();
-  const stale = capture('git', ['status', '--porcelain', '--', bundleOutfile]).trim();
+  const stale = capture('git', ['status', '--porcelain', '--', bundleOutfile, bundleNoticesFile]).trim();
   if (stale) {
-    throw new Error('agent-plugin/dist/server.mjs がコードと一致しません。`npm run bundle` の結果をコミットしてから再実行してください');
+    throw new Error('agent-plugin/dist/ のバンドルがコードと一致しません。`npm run bundle` の結果をコミットしてから再実行してください');
   }
 
   buildPlugin(configuration, resolveGameDir());
 
   const outDir = buildOutputDir(configuration);
-  const entries = artifactDlls.map((dll) => {
-    const path = join(outDir, dll);
-    return {
-      // BepInEx/plugins/ 直下に展開できるフォルダ構成にする
-      name: `COM3D25.DevBridge/${dll}`,
-      data: readFileSync(path),
-      mtime: statSync(path).mtime,
-    };
-  });
+  // Mono.CSharp.dll（MIT）の再配布にはライセンス表示の同梱が要るため、DLL と並べて入れる
+  const files = [
+    ...artifactDlls.map((dll) => join(outDir, dll)),
+    ...releaseNoticeFiles.map((f) => resolve(repoRoot, f)),
+  ];
+  const entries = files.map((path) => ({
+    // BepInEx/plugins/ 直下に展開できるフォルダ構成にする
+    name: `COM3D25.DevBridge/${basename(path)}`,
+    data: readFileSync(path),
+    mtime: statSync(path).mtime,
+  }));
 
   const artifactDir = resolve(repoRoot, 'plugin/bin/release-artifacts');
   mkdirSync(artifactDir, { recursive: true });

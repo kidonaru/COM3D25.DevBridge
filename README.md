@@ -5,7 +5,7 @@
 稼働中のゲームプロセスに localhost 限定の C# REPL を公開し、Claude Code や Codex から
 「ゲームを再起動せずに」状態を調べる・画面をキャプチャする・値を毎フレーム監視する、といった操作を行う。
 
-> **dev 専用ツールです。** 製品モッド等への同梱は禁止です（本リポジトリの Releases は開発者向け配布）。
+> **dev 専用ツールです。** 稼働中のゲームで任意の C# を実行できるため、製品モッド等への同梱や一般利用者への配布は推奨しません（本リポジトリの Releases は開発者向け配布）。
 > 認証は無く、`127.0.0.1` にのみバインドすることでアクセスを制限しています。
 
 ## インストール
@@ -20,6 +20,8 @@
 <GameDir>\BepInEx\plugins\COM3D25.DevBridge\
     COM3D25.DevBridge.dll
     Mono.CSharp.dll
+    LICENSE
+    THIRD-PARTY-NOTICES.md
 ```
 
 ゲームを起動し、`<GameDir>\BepInEx\LogOutput.log` に次の行が出れば成功です:
@@ -140,3 +142,17 @@ Codex ではプラグインのインストール先に保存するため、更�
 ## 開発
 
 ソースからのビルド、テスト、リリース手順は [docs/development.md](docs/development.md) を参照してください。
+
+## ライセンス
+
+[MIT License](LICENSE)
+
+同梱しているサードパーティ製ソフトウェアのライセンスは [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) を参照してください。
+
+### MOD規約
+
+※MODはKISSサポート対象外です。
+※MODを利用するに当たり、問題が発生してもKISSは一切の責任を負いかねます。
+※「カスタムメイド3D2」か「カスタムオーダーメイド3D2」か「CR EditSystem」を購入されている方のみが利用できます。
+※「カスタムメイド3D2」か「カスタムオーダーメイド3D2」か「CR EditSystem」上で表示する目的以外の利用は禁止します。
+※これらの事項は http://kisskiss.tv/kiss/diary.php?no=558 を優先します。

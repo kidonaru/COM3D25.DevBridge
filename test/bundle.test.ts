@@ -51,4 +51,21 @@ describe("bundle", () => {
       rmSync(dir, { recursive: true, force: true });
     }
   }, 30_000);
+
+  it("同梱した npm パッケージのライセンス文をバンドルの隣に書き出す", async () => {
+    const dir = mkdtempSync(join(tmpdir(), "mcp-bundle-"));
+    try {
+      await bundle(join(dir, "dist", "server.mjs"));
+      const notices = readFileSync(join(dir, "dist", "THIRD-PARTY-NOTICES.txt"), "utf8");
+      expect(notices).toContain("@modelcontextprotocol/sdk@");
+      expect(notices).toContain("zod@");
+      // MIT 以外のライセンスも本文ごと入る。fast-uri は ajv 経由の間接依存で、依存更新で消えたら別の非 MIT パッケージに差し替える
+      expect(notices).toMatch(/fast-uri@\S+ \(BSD-3-Clause\)/);
+      expect(notices).toContain("Redistribution and use in source and binary forms");
+      // 開発依存はバンドルに入らないので載せない
+      expect(notices).not.toContain("vitest@");
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  }, 30_000);
 });

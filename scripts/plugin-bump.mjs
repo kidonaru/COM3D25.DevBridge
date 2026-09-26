@@ -2,7 +2,7 @@
 // エージェント向けプラグインのマニフェストの version をまとめて上げ、
 // 再生成したバンドルと合わせてそれらのファイルだけをコミットする。
 import { readFileSync, writeFileSync } from 'node:fs';
-import { bundle, bundleOutfile } from './bundle.mjs';
+import { bundle, bundleNoticesFile, bundleOutfile } from './bundle.mjs';
 import {
   capture,
   claudePluginJsonPath,
@@ -29,8 +29,8 @@ const bumpTargets = [
   serverVersionPath,
 ];
 
-/** コミット対象（bump 対象 + 再生成したバンドル）。 */
-const commitTargets = [...bumpTargets, bundleOutfile];
+/** コミット対象（bump 対象 + 再生成したバンドルとそのライセンス表示）。 */
+const commitTargets = [...bumpTargets, bundleOutfile, bundleNoticesFile];
 
 /**
  * bump 対象にバージョン以外の未コミット変更が無いか確認する。

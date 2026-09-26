@@ -21,6 +21,7 @@ COM3D25.DevBridge をソースから触る人向けの手順。使うだけな�
 | `agent-plugin/.claude-plugin/plugin.json` | Claude Code 用マニフェスト。データ保存先に `${CLAUDE_PLUGIN_DATA}` を渡す |
 | `agent-plugin/.codex-plugin/` | Codex 用マニフェストと MCP 定義 |
 | `agent-plugin/dist/server.mjs` | `npm run bundle` の生成物（依存込みの単一ファイル）。プラグインはインストール時にビルドしないため**コミット対象** |
+| `agent-plugin/dist/THIRD-PARTY-NOTICES.txt` | `npm run bundle` が `server.mjs` と一緒に生成する、同梱 npm パッケージのライセンス文。これも**コミット対象** |
 | `agent-plugin/skills/` | 同梱スキル |
 
 ## 初期設定: `.env`
@@ -123,7 +124,7 @@ npm run plugin:release               # tag push → GitHub Release まで
   - MCP サーバの `package.json` / `package-lock.json` と、initialize で名乗る `src/version.ts` の `SERVER_VERSION`
   - 配布用プラグインの 2 つの `plugin.json`
   
-  さらにバンドル（`agent-plugin/dist/server.mjs`）を再生成し、**これらのファイルだけ**を `chore: v<新Version>` でコミットします。
+  さらにバンドル（`agent-plugin/dist/server.mjs` と `THIRD-PARTY-NOTICES.txt`）を再生成し、**これらのファイルだけ**を `chore: v<新Version>` でコミットします。
   - 開始時点で csproj と `package.json` の版が揃っていないとエラーで停止します。
   - バンドルは HEAD のコードから作るため、`src/` などに未コミットの変更があると停止します。
   - バンドル生成やコミットに失敗した場合は、書き換えたファイルを元に戻します。
@@ -131,7 +132,7 @@ npm run plugin:release               # tag push → GitHub Release まで
   - 前提: working tree が clean で、`gh auth status` が通っていること
   - ビルド前にバンドルを再生成し、コミット済みのものと一致しなければ停止します
   - `--dry-run` でもバンドルを再生成するため、古いバンドルはこの時点で書き換わります
-- zip に入れるのは `COM3D25.DevBridge.dll` と `Mono.CSharp.dll` のみです。
+- zip に入れるのは `COM3D25.DevBridge.dll` と `Mono.CSharp.dll`、およびライセンス文書（`LICENSE` と `THIRD-PARTY-NOTICES.md`）のみです。
   ゲーム由来 DLL（`Assembly-CSharp.dll` 等）は再配布不可のため決して含めません。
 - 既存の tag / Release の状態に応じて動作が変わります:
   - tag と Release が両方ある: バージョン上げ忘れとしてエラー
