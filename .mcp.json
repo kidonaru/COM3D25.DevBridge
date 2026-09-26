@@ -4,7 +4,7 @@
       "command": "node",
       "args": ["dist/index.js"],
       "env": {
-        "BRIDGE_URL": "http://127.0.0.1:18650"
+        "BRIDGE_URL": "http://127.0.0.1:24574"
       }
     }
   }

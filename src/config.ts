@@ -12,7 +12,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env, moduleUrl: stri
   const usable = requested && isAbsolute(requested) && !requested.includes("${");
   const dataDir = usable ? requested : fileURLToPath(new URL("..", moduleUrl));
   return {
-    bridgeUrl: env.BRIDGE_URL ?? "http://127.0.0.1:18650",
+    // 空文字・空白は未設定と同じ扱いにする（設定 UI などから空で渡ってきても既定に落とす）
+    bridgeUrl: env.BRIDGE_URL?.trim() || "http://127.0.0.1:24574",
     gameDirOverride: env.GAME_DIR, // 通常は不要（ブリッジの /ping から自動解決する）
     gameDirCacheFile: join(dataDir, ".game-dir"),
     screenshotDir: join(dataDir, "screenshots"),

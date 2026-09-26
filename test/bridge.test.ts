@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { BridgeClient, BridgeUnreachableError } from "../src/bridge.js";
 
-const BASE = "http://127.0.0.1:18650";
+const BASE = "http://127.0.0.1:24574";
 
 describe("BridgeClient", () => {
   const fetchMock = vi.fn();
@@ -26,6 +26,7 @@ describe("BridgeClient", () => {
     await expect(client.evalCs("1+1")).rejects.toThrow(BridgeUnreachableError);
     await expect(client.evalCs("1+1")).rejects.toThrow(/ゲーム未起動かプラグイン未ロード/);
     await expect(client.evalCs("1+1")).rejects.toThrow(/tail_log/);
+    await expect(client.evalCs("1+1")).rejects.toThrow(/BRIDGE_URL/);
   });
 
   it("captureRaw は target/downscale を query に載せ PNG バイナリを返す", async () => {

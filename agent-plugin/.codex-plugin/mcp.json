@@ -3,7 +3,8 @@
     "com3d25-devbridge": {
       "command": "node",
       "args": ["./dist/server.mjs"],
-      "cwd": "."
+      "cwd": ".",
+      "env_vars": ["BRIDGE_URL", "GAME_DIR"]
     }
   }
 }

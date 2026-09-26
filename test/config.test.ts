@@ -36,6 +36,11 @@ describe("loadConfig", () => {
     const c = loadConfig({ BRIDGE_URL: "http://127.0.0.1:1", GAME_DIR: "Y:\\Game" }, moduleUrl);
     expect(c.bridgeUrl).toBe("http://127.0.0.1:1");
     expect(c.gameDirOverride).toBe("Y:\\Game");
-    expect(loadConfig({}, moduleUrl).bridgeUrl).toBe("http://127.0.0.1:18650");
+    expect(loadConfig({}, moduleUrl).bridgeUrl).toBe("http://127.0.0.1:24574");
+  });
+
+  it("BRIDGE_URL が空文字や空白だけなら既定の URL を使う", () => {
+    expect(loadConfig({ BRIDGE_URL: "" }, moduleUrl).bridgeUrl).toBe("http://127.0.0.1:24574");
+    expect(loadConfig({ BRIDGE_URL: "  " }, moduleUrl).bridgeUrl).toBe("http://127.0.0.1:24574");
   });
 });

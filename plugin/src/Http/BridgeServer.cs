@@ -37,7 +37,17 @@ namespace COM3D25.DevBridge.Http
         public void Start()
         {
             _listener = new TcpListener(IPAddress.Loopback, _port); // 127.0.0.1 限定（LAN 露出しない）
-            _listener.Start();
+            try
+            {
+                _listener.Start();
+            }
+            catch
+            {
+                // bind できなかったソケットを GC 任せにしない
+                _listener.Stop();
+                _listener = null;
+                throw;
+            }
             _running = true;
             _thread = new Thread(AcceptLoop) { IsBackground = true, Name = "COM3D25.DevBridge" };
             _thread.Start();

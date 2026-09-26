@@ -27,7 +27,7 @@ zip のルートにある `README.md` / `LICENSE` / `THIRD-PARTY-NOTICES.md` は
 ゲームを起動し、`<GameDir>\BepInEx\LogOutput.log` に次の行が出れば成功です:
 
 ```
-COM3D25.DevBridge listening on http://127.0.0.1:18650/ (/ping, /eval, /reset, /capture, /imgui_windows, /dump, /watch, /profile)
+COM3D25.DevBridge listening on http://127.0.0.1:24574/ (/ping, /eval, /reset, /capture, /imgui_windows, /dump, /watch, /profile)
 ```
 
 ### 2. MCP サーバーとスキル（Claude Code / Codex）
@@ -129,11 +129,27 @@ Codex ではプラグインのインストール先に保存するため、更�
 | `reload_clothing` | 現在有効な衣装menuの再読み込み（SetPropを使わずboDut/boTempDut）と完了待機・前後比較（[手順と制限](https://github.com/kidonaru/COM3D25.DevBridge/blob/main/docs/clothing-reload.md)） |
 | `tail_log` | `BepInEx/LogOutput.log` の末尾 N 行（パスは自動解決。**クラッシュ中もキャッシュ済みパスで動く**） |
 
+## ポートの変更
+
+既定では `127.0.0.1:24574` で待ち受けます。ポートが他のツールや OS の予約と衝突したときは、
+`LogOutput.log` に原因と変更方法が出ます。
+
+1. `<GameDir>\BepInEx\config\COM3D25.DevBridge.cfg`（初回起動時に作られます）の `[Server]` にある `Port` を変更し、ゲームを再起動する
+2. MCP サーバーの接続先を、環境変数 `BRIDGE_URL` で同じポートに合わせる
+   - Claude Code: `~/.claude/settings.json` に次を書き、セッションを再起動する
+
+     ```json
+     { "env": { "BRIDGE_URL": "http://127.0.0.1:<新しいポート>" } }
+     ```
+
+   - Codex: OS の環境変数 `BRIDGE_URL` を設定してから Codex を起動する（例: `setx BRIDGE_URL http://127.0.0.1:<新しいポート>` の後、ターミナルを開き直す）
+
 ## トラブルシュート
 
 | 症状 | 原因と対処 |
 |---|---|
 | 「ブリッジに接続できません」 | ゲームが起動していないか、プラグインが未ロード。`LogOutput.log` に `COM3D25.DevBridge listening` があるか確認する。`tail_log` はゲーム未起動でも使えます |
+| `LogOutput.log` に「COM3D25.DevBridge を起動できません」と出る | 待受ポートが使用中か OS に予約されている。[ポートの変更](#ポートの変更)の手順で別のポートにする |
 | `eval_csharp` が `compile error` を返し続ける | 評価器の内部状態が壊れている可能性。`reset_evaluator` を実行する（REPL 変数は失われます） |
 | `ping` の `mainThreadAlive` が `false` | ゲームのメインスレッドが固まっている。この状態では `/eval` も `/reset` も同じキューで詰まるため、復旧はゲーム再起動 |
 | `watch_add` が「単一式のみ対応」で失敗 | watch は式のみ対応。複数文・変数宣言は `eval_csharp` を使う |

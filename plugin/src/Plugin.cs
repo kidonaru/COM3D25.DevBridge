@@ -1,4 +1,6 @@
+using System.Net.Sockets;
 using BepInEx;
+using BepInEx.Configuration;
 #if BIE6
 using BepInEx.Unity.Mono;
 #endif
@@ -19,8 +21,8 @@ namespace COM3D25.DevBridge
         internal static ManualLogSource Log;
         private BridgeServer _server;
 
-        // dev 専用のため固定既定ポート（ハードコード許容＝一時/dev ツール）。
-        private const int Port = 18650;
+        // 既定ポート。IANA 未割り当て範囲（24555〜24576）から選んだ。衝突時は cfg で変えられる
+        private const int DefaultPort = 24574;
 
         private void Awake()
         {
@@ -31,10 +33,25 @@ namespace COM3D25.DevBridge
             DontDestroyOnLoad(go);
             var pump = go.AddComponent<MainThreadPump>();
 
+            var port = Config.Bind("Server", "Port", DefaultPort,
+                new ConfigDescription(
+                    "ブリッジが 127.0.0.1 で待ち受けるポート。変えたら MCP サーバー側の BRIDGE_URL も合わせる",
+                    new AcceptableValueRange<int>(1024, 65535))).Value;
+
             Capture.ImGuiWindowRegistry.Install(); // /capture target=imgui: 用の IMGUI ウィンドウ追跡
-            _server = new BridgeServer(Port, pump, Paths.GameRootPath);
-            _server.Start();
-            Log.LogInfo($"COM3D25.DevBridge listening on http://127.0.0.1:{Port}/ (/ping, /eval, /reset, /capture, /imgui_windows, /dump, /watch, /profile)");
+            _server = new BridgeServer(port, pump, Paths.GameRootPath);
+            try
+            {
+                _server.Start();
+            }
+            catch (SocketException ex)
+            {
+                // ポート衝突でプラグインごと落とさず、変更方法をログで案内する
+                _server = null;
+                Log.LogError(BindFailureMessage.Build(port, ex.SocketErrorCode, Config.ConfigFilePath));
+                return;
+            }
+            Log.LogInfo($"COM3D25.DevBridge listening on http://127.0.0.1:{port}/ (/ping, /eval, /reset, /capture, /imgui_windows, /dump, /watch, /profile)");
         }
 
         private void OnDestroy()

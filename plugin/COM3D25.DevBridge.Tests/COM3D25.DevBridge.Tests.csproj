@@ -27,6 +27,7 @@
     <Compile Include="../src/Watch/WatchRegistry.cs" Link="Linked/WatchRegistry.cs" />
     <Compile Include="../src/Profile/ProfileTargetSpec.cs" Link="Linked/ProfileTargetSpec.cs" />
     <Compile Include="../src/Profile/ProfileRegistry.cs" Link="Linked/ProfileRegistry.cs" />
+    <Compile Include="../src/Http/BindFailureMessage.cs" Link="Linked/BindFailureMessage.cs" />
   </ItemGroup>
 
 </Project>

@@ -43,7 +43,8 @@ export class BridgeUnreachableError extends Error {
     super(
       `ブリッジ ${baseUrl} に接続できません。ゲーム未起動かプラグイン未ロードの可能性があります。` +
         `COM3D2.5 を起動し、BepInEx/LogOutput.log に "COM3D25.DevBridge listening" が出ているか確認してください。` +
-        `一度でも接続できていれば、ゲーム未起動でも tail_log でログを読めます（未接続なら GAME_DIR 環境変数でゲームフォルダを指定）。`,
+        `一度でも接続できていれば、ゲーム未起動でも tail_log でログを読めます（未接続なら GAME_DIR 環境変数でゲームフォルダを指定）。` +
+        `ブリッジのポートを変えている場合は、環境変数 BRIDGE_URL を同じポートに合わせてください。`,
     );
     this.name = "BridgeUnreachableError";
   }

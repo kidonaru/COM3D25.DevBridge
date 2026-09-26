@@ -6,7 +6,7 @@ COM3D25.DevBridge をソースから触る人向けの手順。使うだけな�
 
 | 層 | 実体 | 役割 |
 |---|---|---|
-| BepInEx プラグイン | `plugin/`（C#, netstandard2.1） | ゲーム内に HTTP REPL を公開（`127.0.0.1:18650`） |
+| BepInEx プラグイン | `plugin/`（C#, netstandard2.1） | ゲーム内に HTTP REPL を公開（既定 `127.0.0.1:24574`。ポートは BepInEx の cfg で変更可） |
 | MCP サーバー | リポジトリ直下（TypeScript, stdio） | Claude Code / Codex のツール呼び出しを HTTP ブリッジへ中継 |
 | 配布用プラグイン | `agent-plugin/` | Claude Code / Codex のプラグイン。MCP サーバーのバンドルと同梱スキル |
 
@@ -61,7 +61,7 @@ dotnet build plugin/COM3D25.DevBridge.csproj -p:BepInExVersion=6 -p:GameDir=W:\C
 ゲームを起動し、`<GameDir>\BepInEx\LogOutput.log` に次の行が出れば成功です:
 
 ```
-COM3D25.DevBridge listening on http://127.0.0.1:18650/ (/ping, /eval, /reset, /capture, /imgui_windows, /dump, /watch, /profile)
+COM3D25.DevBridge listening on http://127.0.0.1:24574/ (/ping, /eval, /reset, /capture, /imgui_windows, /dump, /watch, /profile)
 ```
 
 ## MCP サーバーの開発セットアップ
@@ -78,7 +78,7 @@ MCP サーバーは次の環境変数を読みます（いずれも省略可）:
 
 | 変数 | 既定 | 用途 |
 |---|---|---|
-| `BRIDGE_URL` | `http://127.0.0.1:18650` | 接続先のブリッジ |
+| `BRIDGE_URL` | `http://127.0.0.1:24574` | 接続先のブリッジ |
 | `GAME_DIR` | なし | ゲームのインストール先。通常はブリッジの `/ping` から自動解決するので不要 |
 | `COM3D25_DEVBRIDGE_DATA_DIR` | パッケージのルート | スクリーンショットとゲームパスのキャッシュの保存先（絶対パスのみ有効） |
 

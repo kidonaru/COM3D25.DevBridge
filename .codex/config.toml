@@ -3,4 +3,4 @@ command = "node"
 args = ["dist/index.js"]
 
 [mcp_servers.com3d25-devbridge.env]
-BRIDGE_URL = "http://127.0.0.1:18650"
+BRIDGE_URL = "http://127.0.0.1:24574"
