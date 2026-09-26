@@ -21162,7 +21162,7 @@ async function pingInfo(bridge2) {
 var BridgeUnreachableError = class extends Error {
   constructor(baseUrl) {
     super(
-      `\u30D6\u30EA\u30C3\u30B8 ${baseUrl} \u306B\u63A5\u7D9A\u3067\u304D\u307E\u305B\u3093\u3002\u30B2\u30FC\u30E0\u672A\u8D77\u52D5\u304B\u30D7\u30E9\u30B0\u30A4\u30F3\u672A\u30ED\u30FC\u30C9\u306E\u53EF\u80FD\u6027\u304C\u3042\u308A\u307E\u3059\u3002COM3D2.5 \u3092\u8D77\u52D5\u3057\u3001BepInEx/LogOutput.log \u306B "COM3D25.DevBridge listening" \u304C\u51FA\u3066\u3044\u308B\u304B\u78BA\u8A8D\u3057\u3066\u304F\u3060\u3055\u3044\u3002\u4E00\u5EA6\u3067\u3082\u63A5\u7D9A\u3067\u304D\u3066\u3044\u308C\u3070\u3001\u30B2\u30FC\u30E0\u672A\u8D77\u52D5\u3067\u3082 tail_log \u3067\u30ED\u30B0\u3092\u8AAD\u3081\u307E\u3059\uFF08\u672A\u63A5\u7D9A\u306A\u3089 GAME_DIR \u74B0\u5883\u5909\u6570\u3067\u30B2\u30FC\u30E0\u30D5\u30A9\u30EB\u30C0\u3092\u6307\u5B9A\uFF09\u3002`
+      `\u30D6\u30EA\u30C3\u30B8 ${baseUrl} \u306B\u63A5\u7D9A\u3067\u304D\u307E\u305B\u3093\u3002\u30B2\u30FC\u30E0\u672A\u8D77\u52D5\u304B\u30D7\u30E9\u30B0\u30A4\u30F3\u672A\u30ED\u30FC\u30C9\u306E\u53EF\u80FD\u6027\u304C\u3042\u308A\u307E\u3059\u3002COM3D2.5 \u3092\u8D77\u52D5\u3057\u3001BepInEx/LogOutput.log \u306B "COM3D25.DevBridge listening" \u304C\u51FA\u3066\u3044\u308B\u304B\u78BA\u8A8D\u3057\u3066\u304F\u3060\u3055\u3044\u3002\u4E00\u5EA6\u3067\u3082\u63A5\u7D9A\u3067\u304D\u3066\u3044\u308C\u3070\u3001\u30B2\u30FC\u30E0\u672A\u8D77\u52D5\u3067\u3082 tail_log \u3067\u30ED\u30B0\u3092\u8AAD\u3081\u307E\u3059\uFF08\u672A\u63A5\u7D9A\u306A\u3089 GAME_DIR \u74B0\u5883\u5909\u6570\u3067\u30B2\u30FC\u30E0\u30D5\u30A9\u30EB\u30C0\u3092\u6307\u5B9A\uFF09\u3002\u30D6\u30EA\u30C3\u30B8\u306E\u30DD\u30FC\u30C8\u3092\u5909\u3048\u3066\u3044\u308B\u5834\u5408\u306F\u3001\u74B0\u5883\u5909\u6570 BRIDGE_URL \u3092\u540C\u3058\u30DD\u30FC\u30C8\u306B\u5408\u308F\u305B\u3066\u304F\u3060\u3055\u3044\u3002`
     );
     this.name = "BridgeUnreachableError";
   }
@@ -21270,7 +21270,8 @@ function loadConfig(env = process.env, moduleUrl = import.meta.url) {
   const usable = requested && isAbsolute(requested) && !requested.includes("${");
   const dataDir = usable ? requested : fileURLToPath(new URL("..", moduleUrl));
   return {
-    bridgeUrl: env.BRIDGE_URL ?? "http://127.0.0.1:18650",
+    // 空文字・空白は未設定と同じ扱いにする（設定 UI などから空で渡ってきても既定に落とす）
+    bridgeUrl: env.BRIDGE_URL?.trim() || "http://127.0.0.1:24574",
     gameDirOverride: env.GAME_DIR,
     // 通常は不要（ブリッジの /ping から自動解決する）
     gameDirCacheFile: join(dataDir, ".game-dir"),
@@ -21279,7 +21280,7 @@ function loadConfig(env = process.env, moduleUrl = import.meta.url) {
 }
 
 // src/version.ts
-var SERVER_VERSION = "1.0.0";
+var SERVER_VERSION = "1.1.0";
 
 // src/game-dir.ts
 import { readFileSync, writeFileSync } from "node:fs";
